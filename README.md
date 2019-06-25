@@ -5,6 +5,8 @@
 
 A CI image for use in `usvc` projects which require Docker to build.
 
+Docker Hub URL: https://hub.docker.com/r/usvc/ci-docker
+
 # Development Runbook
 
 ## CI Configuration
