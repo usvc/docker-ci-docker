@@ -1,0 +1,17 @@
+image: docker:stable
+
+services:
+  - docker:dind
+
+stages:
+  - publish
+
+before_script:
+  - apk add make
+
+build and publish:
+  stage: publish
+  script:
+    - docker login ${DOCKER_REGISTRY_URL} -u ${DOCKER_REGISTRY_USER} -p ${DOCKER_REGISTRY_PASSWORD}
+    - make publish
+    - docker logout
