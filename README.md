@@ -1,6 +1,6 @@
 # `ci-docker`
 
-[![pipeline status](https://gitlab.com/usvc/ci-docker/badges/master/pipeline.svg)](https://gitlab.com/usvc/ci-docker/commits/master)
+[![pipeline status](https://gitlab.com/usvc/ci/docker/badges/master/pipeline.svg)](https://gitlab.com/usvc/ci/docker/commits/master)
 
 
 A CI image for use in `usvc` projects which require Docker to build.

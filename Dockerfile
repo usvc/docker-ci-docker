@@ -11,7 +11,7 @@ LABEL \
   description="a ci image for use with builds that require docker" \
   author="zephinzer" \
   maintainer="zephinzer" \
-  canonical_url="https://gitlab.com/usvc/images/ci-docker"
+  canonical_url="https://gitlab.com/usvc/ci/docker"
 
 FROM base AS gitlab
 ENV DOCKER_HOST=tcp://docker:2375/ \
