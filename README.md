@@ -1,11 +1,9 @@
 # `ci-docker`
 
 [![pipeline status](https://gitlab.com/usvc/ci/docker/badges/master/pipeline.svg)](https://gitlab.com/usvc/ci/docker/commits/master)
-
+[![dockerhub link](https://img.shields.io/badge/dockerhub-usvc%2Fci--docker-blue.svg)](https://hub.docker.com/r/usvc/ci-docker)
 
 A CI image for use in `usvc` projects which require Docker to build.
-
-Docker Hub URL: https://hub.docker.com/r/usvc/ci-docker
 
 # Development Runbook
 
