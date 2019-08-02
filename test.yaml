@@ -1,0 +1,22 @@
+schemaVersion: 2.0.0
+commandTests:
+- name: "container-structure-test"
+  command: "which"
+  args: ["container-structure-test"]
+  expectedOutput: ["/bin/container-structure-test"]
+- name: "docker"
+  command: "which"
+  args: ["docker"]
+  expectedOutput: ["/bin/docker"]
+- name: "docker-compose"
+  command: "which"
+  args: ["docker-compose"]
+  expectedOutput: ["/bin/docker-compose"]
+- name: "git"
+  command: "which"
+  args: ["git"]
+  expectedOutput: ["/bin/git"]
+- name: "make"
+  command: "which"
+  args: ["make"]
+  expectedOutput: ["/bin/make"]

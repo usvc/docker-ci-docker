@@ -1,16 +1,30 @@
-image: docker:stable
-
+image: usvc/ci-docker:gitlab-latest
 services:
   - docker:dind
-
 stages:
-  - publish
+  - validate
+  - release
 
 before_script:
   - apk add make
 
+build:
+  stage: validate
+  script:
+    - make build
+
+build gitlab:
+  stage: validate
+  script:
+    - make build_gitlab
+
+test:
+  stage: validate
+  script:
+    - make test
+
 build and publish:
-  stage: publish
+  stage: release
   script:
     - docker login ${DOCKER_REGISTRY_URL} -u ${DOCKER_REGISTRY_USER} -p ${DOCKER_REGISTRY_PASSWORD}
     - make publish

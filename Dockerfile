@@ -12,6 +12,8 @@ LABEL \
   author="zephinzer" \
   maintainer="zephinzer" \
   canonical_url="https://gitlab.com/usvc/ci/docker"
+RUN curl -Lo /bin/container-structure-test "https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64" \
+  && chmod +x /bin/container-structure-test
 
 FROM base AS gitlab
 ENV DOCKER_HOST=tcp://docker:2375/ \
