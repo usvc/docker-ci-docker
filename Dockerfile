@@ -1,5 +1,5 @@
 FROM alpine:latest AS base
-RUN wget -o /usr/bin/alpine-bootstrap.sh https://gitlab.com/usvc/ci/base/raw/master/shared/alpine-bootstrap.sh \
+RUN wget -O /usr/bin/alpine-bootstrap.sh https://gitlab.com/usvc/images/ci/base/raw/master/shared/alpine-bootstrap.sh \
   && chmod +x /usr/bin/alpine-bootstrap.sh \
   && /usr/bin/alpine-bootstrap.sh
 RUN apk add --no-cache docker py-pip python-dev libffi-dev libc-dev openssl-dev
