@@ -12,6 +12,17 @@ Contains tools from [`usvc/ci-base` (click to see the repository)](https://gitla
 
 # Usage
 
+## Local
+
+For the packaged Docker client to work, you'll need to map your host's Docker daemon socket into the container. You can do this by running your Docker container using the `--volume` flag. An example of opening a shell into a container based on the `usvc/ci-docker:latest` image would be:
+
+```sh
+docker run -it \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  --entrypoint=/bin/sh \
+  usvc/ci-docker:latest;
+```
+
 ## GitLab CI
 
 ### Standard Usage
