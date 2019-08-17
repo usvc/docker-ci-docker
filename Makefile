@@ -74,33 +74,34 @@ version_docker:
 	docker run \
 		--entrypoint=docker \
 		--volume /var/run/docker.sock:/var/run/docker.sock \
-		$(IMAGE_URL):${TAG} version --format '{{ .Client.Version }}' \
+		$(IMAGE_URL):${TAG} version \
+			--format '{{ .Client.Version }}' \
 		> ./.version/docker
 
 publish:
 	$(MAKE) publish_base
 	$(MAKE) publish_gitlab
 publish_base:
-	$(MAKE) version_alpine TAG=latest
-	$(MAKE) version_docker TAG=latest
 	mkdir -p ./.version
 	docker push $(IMAGE_URL):latest
 	# usvc/ci-docker:YYYYMMDD
 	$(MAKE) utils.tag_and_push FROM=latest TO=$(DATE_TIMESTAMP)
 	# usvc/ci-docker:alpine-<alpine_version>
+	$(MAKE) version_alpine TAG=latest
 	$(MAKE) utils.tag_and_push FROM=latest TO=alpine-$$(cat ./.version/alpine)
 	# usvc/ci-docker:<docker_client_version>
+	$(MAKE) version_docker TAG=latest
 	$(MAKE) utils.tag_and_push FROM=latest TO=$$(cat ./.version/docker)
 publish_gitlab:
-	$(MAKE) version_alpine TAG=gitlab-latest
-	$(MAKE) version_docker TAG=gitlab-latest
 	mkdir -p ./.version
 	docker push $(IMAGE_URL):gitlab-latest
 	# usvc/ci-docker:gitlab-YYYYMMDD
 	$(MAKE) utils.tag_and_push FROM=gitlab-latest TO=gitlab-$(DATE_TIMESTAMP)
 	# usvc/ci-docker:gitlab-alpine-<alpine_version>
+	$(MAKE) version_alpine TAG=gitlab-latest
 	$(MAKE) utils.tag_and_push FROM=latest TO=gitlab-alpine-$$(cat ./.version/alpine)
 	# usvc/ci-docker:gitlab-<docker_client_version>
+	$(MAKE) version_docker TAG=gitlab-latest
 	$(MAKE) utils.tag_and_push FROM=gitlab-latest TO=gitlab-$$(cat ./.version/docker)
 
 utils.tag_and_push:
