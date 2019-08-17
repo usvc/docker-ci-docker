@@ -2,30 +2,33 @@ image: usvc/ci-docker:gitlab-latest
 services:
   - docker:dind
 stages:
-  - validate
-  - release
-
-before_script:
-  - apk add make
+  - build
+  - test
+  - publish
 
 build:
-  stage: validate
+  stage: build
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - ./.export
   script:
     - make build
-
-build gitlab:
-  stage: validate
-  script:
-    - make build_gitlab
+    - make ci.export
 
 test:
-  stage: validate
+  stage: test
+  dependencies: ["build"]
   script:
+    - make ci.import
     - make test
+    - make test_from
 
-build and publish:
-  stage: release
+dockerhub:
+  stage: publish
+  dependencies: ["build"]
   script:
+    - make ci.import
     - docker login ${DOCKER_REGISTRY_URL} -u ${DOCKER_REGISTRY_USER} -p ${DOCKER_REGISTRY_PASSWORD}
     - make publish
     - docker logout
