@@ -8,6 +8,7 @@ A lightweight CI image for use in `usvc` projects which require Docker operation
 Contains tools from [`usvc/ci-base` (click to see the repository)](https://gitlab.com/usvc/images/ci/base) and also:
   - the Docker daemon
   - the Docker Compose CLI tool
+  - Container Structure Test tool from Google for testing Docker images
 
 # Usage
 
@@ -40,6 +41,16 @@ job_name:
 ```
 
 # Development Runbook
+
+## Makefile
+
+`make` is used to codify the common operations required to build/test/publish this image. See the [`./Makefile`](./Makefile) for details on more granular recipes.
+
+To build all images, run `make build`.
+
+To test all images, run `make test`.
+
+To publish all images, run `make publish`.
 
 ## CI Configuration
 

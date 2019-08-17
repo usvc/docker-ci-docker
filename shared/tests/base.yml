@@ -12,11 +12,3 @@ commandTests:
   command: "which"
   args: ["docker-compose"]
   expectedOutput: ["/bin/docker-compose"]
-- name: "git"
-  command: "which"
-  args: ["git"]
-  expectedOutput: ["/bin/git"]
-- name: "make"
-  command: "which"
-  args: ["make"]
-  expectedOutput: ["/bin/make"]

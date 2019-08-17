@@ -40,6 +40,8 @@ ci.import_gitlab:
 test:
 	$(MAKE) test_base
 	$(MAKE) test_gitlab
+	$(MAKE) test_from TAG=latest
+	$(MAKE) test_from TAG=gitlab-latest
 test_base: build_base
 	container-structure-test test \
 	 	--verbosity debug \
