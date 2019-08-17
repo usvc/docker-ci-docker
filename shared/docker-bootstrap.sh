@@ -6,7 +6,7 @@ set -x;
 #
 apk add --no-cache docker gcc libffi-dev musl-dev openssl-dev py-pip python-dev;
 pip install --no-cache-dir docker-compose;
-apk del --no-cache gcc py-pip
+apk del --no-cache gcc py-pip libffi-dev musl-dev openssl-dev
 
 #
 # container-structure-test
