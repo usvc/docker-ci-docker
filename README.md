@@ -12,7 +12,7 @@ Contains tools from [`usvc/ci-base` (click to see the repository)](https://gitla
 
 # Usage
 
-## Local
+## Local execution
 
 For the packaged Docker client to work, you'll need to map your host's Docker daemon socket into the container. You can do this by running your Docker container using the `--volume` flag. An example of opening a shell into a container based on the `usvc/ci-docker:latest` image would be:
 
@@ -21,6 +21,26 @@ docker run -it \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   --entrypoint=/bin/sh \
   usvc/ci-docker:latest;
+```
+
+## As a base in other Docker images
+
+You can simply use the `FROM` directive for this:
+
+```dockerfile
+FROM usvc/ci-docker:latest
+```
+
+## As a script in other Docker images
+
+If you'd like to use another Alpine-based image but use the tools from this image, you can also use the `RUN` directive to set up your image the same way this image is set up:
+
+```dockerfile
+# ...
+RUN wget -O /usr/bin/docker-bootstrap.sh https://gitlab.com/usvc/images/ci/docker/raw/master/shared/docker-bootstrap.sh \
+  && chmod +x /usr/bin/docker-bootstrap.sh \
+  && /usr/bin/docker-bootstrap.sh \
+  && rm -rf /usr/bin/docker-bootstrap.sh
 ```
 
 ## GitLab CI
