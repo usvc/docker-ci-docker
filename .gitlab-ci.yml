@@ -22,7 +22,6 @@ test:
   script:
     - make ci.import
     - make test
-    - make test_from
 
 dockerhub:
   stage: publish
