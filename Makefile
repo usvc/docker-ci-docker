@@ -101,7 +101,7 @@ publish_gitlab:
 	$(MAKE) version_alpine TAG=gitlab-latest
 	$(MAKE) utils.tag_and_push FROM=latest TO=gitlab-alpine-$$(cat ./.version/alpine)
 	# usvc/ci-docker:gitlab-<docker_client_version>
-	$(MAKE) version_docker TAG=gitlab-latest
+	$(MAKE) version_docker TAG=latest
 	$(MAKE) utils.tag_and_push FROM=gitlab-latest TO=gitlab-$$(cat ./.version/docker)
 
 utils.tag_and_push:
