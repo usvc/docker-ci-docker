@@ -7,8 +7,9 @@ COPY ./shared/docker-bootstrap.sh /usr/bin/docker-bootstrap.sh
 RUN chmod +x /usr/bin/docker-bootstrap.sh \
   && /usr/bin/docker-bootstrap.sh
 WORKDIR /
+VOLUME [ "/var/run/docker.sock" ]
 LABEL \
-  description="A ci image for use with builds that require docker" \
+  description="A CI image for use with builds that require docker" \
   canonical_url="https://gitlab.com/usvc/images/ci/docker" \
   license="MIT" \
   maintainer="zephinzer" \

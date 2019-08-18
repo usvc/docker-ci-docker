@@ -12,3 +12,5 @@ commandTests:
   command: "which"
   args: ["docker-compose"]
   expectedOutput: ["/bin/docker-compose"]
+metadataTest:
+  volumes: ["/var/run/docker.sock"]
