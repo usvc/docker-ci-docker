@@ -11,6 +11,7 @@ Docker is a container runtime that allows for Dockerfiles to be built into image
 4. [Container Structure Test](https://github.com/GoogleContainerTools/container-structure-test)
 
 **Table of Contents**
+
 - [Docker image with Docker for CI use](#docker-image-with-docker-for-ci-use)
 - [Usage](#usage)
   - [Local execution](#local-execution)
