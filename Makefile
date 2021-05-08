@@ -1,7 +1,7 @@
 REGISTRY := docker.io
 NAMESPACE := usvc
 REPO := ci-docker
-COMMIT_SHA := $(shell git rev-parse HEAD)
+COMMIT_SHA := $(shell git rev-parse HEAD | head -c 8)
 
 # use this to override the above
 -include ./Makefile.properties
@@ -12,16 +12,22 @@ VERSION := $(shell date +'%Y%m%d%H%M%S')
 build:
 	docker build --tag $(NAMESPACE)/$(REPO):latest .
 
+# builds this image using a cache
+build-with-cache:
+	docker build \
+		--cache-from $(NAMESPACE)/$(REPO):latest \
+		--tag $(NAMESPACE)/$(REPO):latest .
+
 # lints this image for best-practices
 lint:
 	hadolint ./Dockerfile
 
 # tests this iamge for structure integrity
-test: build
+test: build-with-cache
 	container-structure-test test --config ./.Dockerfile.yaml --image $(NAMESPACE)/$(REPO):latest
 
 # scans this image for known vulnerabilities
-scan: build
+scan: build-with-cache
 	trivy image $(NAMESPACE)/$(REPO):latest
 
 # publishes this image using the date/time stamp
