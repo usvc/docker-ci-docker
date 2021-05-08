@@ -1,0 +1,42 @@
+schemaVersion: "2.0.0"
+commandTests:
+  - name: "docker is in path"
+    command: "which"
+    args: ["docker"]
+    expectedOutput: ["/bin/docker"]
+  - name: "docker is executable"
+    command: "docker"
+    args: ["--version"]
+    expectedOutput: ["Docker version [0-9]+\\.[0-9]+\\.[0-9]+"]
+  - name: "docker-compose"
+    command: "which"
+    args: ["docker-compose"]
+    expectedOutput: ["/usr/local/bin/docker-compose"]
+  - name: "docker-compose is executable"
+    command: "docker-compose"
+    args: ["--version"]
+    expectedOutput: ["docker-compose version [0-9]+\\.[0-9]+\\.[0-9]+"]
+  - name: "container-structure-test"
+    command: "which"
+    args: ["container-structure-test"]
+    expectedOutput: ["/usr/local/bin/container-structure-test"]
+  - name: "container-structure-test is executable"
+    command: "container-structure-test"
+    args: ["version"]
+    expectedOutput: ["v[0-9]+\\.[0-9]+\\.[0-9]+"]
+  - name: "hadolint"
+    command: "which"
+    args: ["hadolint"]
+    expectedOutput: ["/usr/local/bin/hadolint"]
+  - name: "hadolint is executable"
+    command: "hadolint"
+    args: ["--version"]
+    expectedOutput: ["Haskell Dockerfile Linter [0-9]+\\.[0-9]+\\.[0-9]+"]
+  - name: "trivy"
+    command: "which"
+    args: ["trivy"]
+    expectedOutput: ["/usr/local/bin/trivy"]
+  - name: "trivy is executable"
+    command: "trivy"
+    args: ["--version"]
+    expectedOutput: ["Version: [0-9]+\\.[0-9]+\\.[0-9]+"]

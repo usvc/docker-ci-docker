@@ -1,14 +1,27 @@
-# Base Image containing Docker for CI use 
+# Docker image with Docker for CI use
 
 [![pipeline status](https://gitlab.com/usvc/images/ci/docker/badges/master/pipeline.svg)](https://gitlab.com/usvc/images/ci/docker/commits/master)
 [![dockerhub link](https://img.shields.io/badge/dockerhub-usvc%2Fci--docker-blue.svg)](https://hub.docker.com/r/usvc/ci-docker)
 
-A lightweight CI image for use in `usvc` projects which require Docker operations.
+Docker is a container runtime that allows for Dockerfiles to be built into images for use in deployments. This repository contains instructions to build a Docker image with the following installed:
 
-Contains tools from [`usvc/ci-base` (click to see the repository)](https://gitlab.com/usvc/images/ci/base) and also:
-  - the Docker daemon
-  - the Docker Compose CLI tool
-  - Container Structure Test tool from Google for testing Docker images
+1. [Docker](https://www.docker.com/)
+2. [Trivy](https://github.com/aquasecurity/trivy)
+3. [Hadolint](https://github.com/hadolint/hadolint)
+4. [Container Structure Test](https://github.com/GoogleContainerTools/container-structure-test)
+
+**Table of Contents**
+- [Docker image with Docker for CI use](#docker-image-with-docker-for-ci-use)
+- [Usage](#usage)
+  - [Local execution](#local-execution)
+  - [As a base in other Docker images](#as-a-base-in-other-docker-images)
+  - [GitLab CI](#gitlab-ci)
+    - [Standard Usage](#standard-usage)
+    - [With Docker-in-Docker (`dind`)](#with-docker-in-docker-dind)
+- [Development Runbook](#development-runbook)
+  - [Development](#development)
+  - [Continuous Integration](#continuous-integration)
+- [License](#license)
 
 # Usage
 
@@ -18,10 +31,13 @@ For the packaged Docker client to work, you'll need to map your host's Docker da
 
 ```sh
 docker run -it \
+  --env DOCKER_HOST= \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   --entrypoint=/bin/sh \
   usvc/ci-docker:latest;
 ```
+
+> The `DOCKER_HOST` is set to an empty value because this image is meant for Gitlab usage which requires `DOCKER_HOST` to be set to `tcp://docker:2375/` to work
 
 ## As a base in other Docker images
 
@@ -29,18 +45,6 @@ You can simply use the `FROM` directive for this:
 
 ```dockerfile
 FROM usvc/ci-docker:latest
-```
-
-## As a script in other Docker images
-
-If you'd like to use another Alpine-based image but use the tools from this image, you can also use the `RUN` directive to set up your image the same way this image is set up:
-
-```dockerfile
-# ...
-RUN wget -O /usr/bin/docker-bootstrap.sh https://gitlab.com/usvc/images/ci/docker/raw/master/shared/docker-bootstrap.sh \
-  && chmod +x /usr/bin/docker-bootstrap.sh \
-  && /usr/bin/docker-bootstrap.sh \
-  && rm -rf /usr/bin/docker-bootstrap.sh
 ```
 
 ## GitLab CI
@@ -64,7 +68,7 @@ Use the image by specifying the `job.image` value as `"usvc/ci-docker:gitlab-lat
 ```yaml
 job_name:
   stage: stage_name
-  image: usvc/ci-docker:gitlab-latest
+  image: usvc/ci-docker:latest
   services:
     - docker:dind
   script:
@@ -73,25 +77,22 @@ job_name:
 
 # Development Runbook
 
-## Makefile
+## Development
 
-`make` is used to codify the common operations required to build/test/publish this image. See the [`./Makefile`](./Makefile) for details on more granular recipes.
+2. Run `make lint` to lint the Dockerfile
+1. Run `make build` to build the image
+3. Run `make scan` to run security scans on the built image
+4. Run `make test` to run contract tests against the built image
+5. Run `make publish` to publish the image
 
-To build all images, run `make build`.
+## Continuous Integration
 
-To test all images, run `make test`.
+The following variables need to be defined in the CI pipieline:
 
-To publish all images, run `make publish`.
+1. `DOCKER_REGISTRY_URI`: the Docker registry to push to
+1. `DOCKER_REGISTRY_USER`: user of the Docker registry to push to
+1. `DOCKER_REGISTRY_PASSWORD`: password for the user of the Docker registry to push to
 
-## CI Configuration
-
-Set the following variables in the environment variable configuration of your GitLab CI:
-
-| Key | Value |
-| ---: | :--- |
-| DOCKER_REGISTRY_URL | URL to your Docker registry |
-| DOCKER_REGISTRY_USER | Username for your registry user |
-| DOCKER_REGISTRY_PASSWORD | Password for your registry user |
 
 # License
 

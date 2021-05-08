@@ -1,109 +1,45 @@
-IMAGE_URL=usvc/ci-docker
+REGISTRY := docker.io
+NAMESPACE := usvc
+REPO := ci-docker
+COMMIT_SHA := $(shell git rev-parse HEAD)
 
-# override whatever you want in here
+# use this to override the above
 -include ./Makefile.properties
 
-DATE_TIMESTAMP=$$(date +'%Y')$$(date +'%m')$$(date +'%d')
+VERSION := $(shell date +'%Y%m%d%H%M%S')
 
+# builds this image
 build:
-	$(MAKE) build_base
-	$(MAKE) build_gitlab
-build_base:
-	docker build \
-		--tag $(IMAGE_URL):latest \
-		--target base \
-		.
-build_gitlab:
-	docker build \
-		--tag $(IMAGE_URL):gitlab-latest \
-		--target gitlab \
-		.
+	docker build --tag $(NAMESPACE)/$(REPO):latest .
 
-ci.export:
-	$(MAKE) ci.export_base
-	$(MAKE) ci.export_gitlab
-ci.export_base:
-	mkdir -p ./.export
-	docker save --output ./.export/base.tar $(IMAGE_URL):latest
-ci.export_gitlab:
-	mkdir -p ./.export
-	docker save --output ./.export/gitlab.tar $(IMAGE_URL):gitlab-latest
+# lints this image for best-practices
+lint:
+	hadolint ./Dockerfile
 
-ci.import:
-	-$(MAKE) ci.import_base
-	-$(MAKE) ci.import_gitlab
-ci.import_base:
-	docker load --input ./.export/base.tar
-ci.import_gitlab:
-	docker load --input ./.export/gitlab.tar
+# tests this iamge for structure integrity
+test: build
+	container-structure-test test --config ./.Dockerfile.yaml --image $(NAMESPACE)/$(REPO):latest
 
-test:
-	$(MAKE) test_base
-	$(MAKE) test_gitlab
-	$(MAKE) test_from TAG=latest
-	$(MAKE) test_from TAG=gitlab-latest
-test_base: build_base
-	container-structure-test test \
-	 	--verbosity debug \
-	 	--image $(IMAGE_URL):latest \
-		--config ./shared/tests/base.yml
-test_gitlab: build_gitlab
-	container-structure-test test \
-	 	--verbosity debug \
-	 	--image $(IMAGE_URL):gitlab-latest \
-		--config ./shared/tests/gitlab.yml
-test_from:
-	@if [ "${TAG}" = "" ]; then \
-		printf -- "\n\n\033[1m> you need to specify a TAG environment variable\033[0m\n\n"; \
-		exit 1; \
-	fi
-	curl -Lo ./shared/tests/from.yml "https://gitlab.com/usvc/images/ci/base/raw/master/shared/tests/base.yml"
-	container-structure-test test \
-	 	--verbosity debug \
-	 	--image $(IMAGE_URL):${TAG} \
-		--config ./shared/tests/from.yml
-	rm -rf ./shared/tests/from.yml
+# scans this image for known vulnerabilities
+scan: build
+	trivy image $(NAMESPACE)/$(REPO):latest
 
-version_alpine:
-	mkdir -p ./.version
-	docker run --entrypoint=cat \
-		$(IMAGE_URL):${TAG} /etc/alpine-release \
-		> ./.version/alpine
-version_docker:
-	mkdir -p ./.version
-	docker run \
-		--entrypoint=docker \
-		--volume /var/run/docker.sock:/var/run/docker.sock \
-		$(IMAGE_URL):${TAG} version \
-			--format '{{ .Client.Version }}' \
-		> ./.version/docker
+# publishes this image using the date/time stamp
+publish: build
+	docker tag $(NAMESPACE)/$(REPO):latest $(REGISTRY)/$(NAMESPACE)/$(REPO):$(VERSION)
+	docker push $(REGISTRY)/$(NAMESPACE)/$(REPO):$(VERSION)
 
-publish:
-	$(MAKE) publish_base
-	$(MAKE) publish_gitlab
-publish_base:
-	mkdir -p ./.version
-	docker push $(IMAGE_URL):latest
-	# usvc/ci-docker:YYYYMMDD
-	$(MAKE) utils.tag_and_push FROM=latest TO=$(DATE_TIMESTAMP)
-	# usvc/ci-docker:alpine-<alpine_version>
-	$(MAKE) version_alpine TAG=latest
-	$(MAKE) utils.tag_and_push FROM=latest TO=alpine-$$(cat ./.version/alpine)
-	# usvc/ci-docker:<docker_client_version>
-	$(MAKE) version_docker TAG=latest
-	$(MAKE) utils.tag_and_push FROM=latest TO=$$(cat ./.version/docker)
-publish_gitlab:
-	mkdir -p ./.version
-	docker push $(IMAGE_URL):gitlab-latest
-	# usvc/ci-docker:gitlab-YYYYMMDD
-	$(MAKE) utils.tag_and_push FROM=gitlab-latest TO=gitlab-$(DATE_TIMESTAMP)
-	# usvc/ci-docker:gitlab-alpine-<alpine_version>
-	$(MAKE) version_alpine TAG=gitlab-latest
-	$(MAKE) utils.tag_and_push FROM=latest TO=gitlab-alpine-$$(cat ./.version/alpine)
-	# usvc/ci-docker:gitlab-<docker_client_version>
-	$(MAKE) version_docker TAG=latest
-	$(MAKE) utils.tag_and_push FROM=gitlab-latest TO=gitlab-$$(cat ./.version/docker)
+# publishes this image using the commit sha without building
+publish-ci:
+	docker tag $(NAMESPACE)/$(REPO):latest $(REGISTRY)/$(NAMESPACE)/$(REPO):$(COMMIT_SHA)
+	docker push $(REGISTRY)/$(NAMESPACE)/$(REPO):$(COMMIT_SHA)
 
-utils.tag_and_push:
-	docker tag $(IMAGE_URL):${FROM} $(IMAGE_URL):${TO}
-	docker push $(IMAGE_URL):${TO}
+# exports this image into a tarball (use in ci cache)
+export: build
+	mkdir -p ./images
+	docker save $(NAMESPACE)/$(REPO):latest -o ./images/$(NAMESPACE)-$(REPO).tar.gz
+
+# import this image from a tarball (use in ci cache)
+import:
+	mkdir -p ./images
+	-docker load -i ./images/$(NAMESPACE)-$(REPO).tar.gz
